@@ -1,0 +1,88 @@
+# 公众号创作工作台 - 信源自动采集定时任务
+# 每6小时运行一次，抓取官方公开列表页，输出 sources.json
+# 工作台通过 jsDelivr CDN 自动拉取此文件
+
+name: 信源自动采集
+
+on:
+  schedule:
+    # 每6小时运行一次（北京时间 08:00 / 14:00 / 20:00 / 02:00）
+    # UTC 时间 = 北京时间 - 8小时
+    - cron: '0 0,6,12,18 * * *'
+  # 支持手动触发
+  workflow_dispatch:
+  # 推送代码时触发（测试用）
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: write  # 需要写权限来提交 sources.json
+
+jobs:
+  fetch-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          # 本脚本仅使用标准库，无需额外依赖
+          # 如需更强大的 HTML 解析，可取消下面的注释：
+          # pip install beautifulsoup4 requests
+
+      - name: 运行采集脚本
+        run: python scripts/fetch_sources.py
+        env:
+          TZ: Asia/Shanghai
+
+      - name: 检查输出文件
+        run: |
+          if [ ! -f data/sources.json ]; then
+            echo "❌ 输出文件不存在！"
+            exit 1
+          fi
+          echo "✅ 输出文件存在"
+          ls -lh data/sources.json
+          echo "--- 文件内容预览 ---"
+          head -c 500 data/sources.json
+          echo ""
+
+      - name: 提交并推送结果
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/sources.json
+          # 只有文件有变化才提交
+          if git diff --cached --quiet; then
+            echo "📭 数据无变化，跳过提交"
+          else
+            git commit -m "📡 自动采集信源数据 $(date '+%Y-%m-%d %H:%M')"
+            git push
+            echo "✅ 数据已提交并推送"
+          fi
+
+      - name: 刷新 jsDelivr CDN 缓存
+        run: |
+          # jsDelivr 缓存约12小时，调用 Purge API 强制刷新
+          # 需要在仓库 Settings > Secrets 中配置 JSDELIVR_API_TOKEN
+          if [ -n "${{ secrets.JSDELIVR_API_TOKEN }}" ]; then
+            echo "🔄 正在刷新 jsDelivr CDN 缓存..."
+            curl -X POST "https://data.jsdelivr.com/v1/packages/gh/${{ github.repository }}@main/refresh" \
+              -H "Authorization: Bearer ${{ secrets.JSDELIVR_API_TOKEN }}" \
+              -H "Content-Type: application/json" || echo "⚠ CDN刷新失败（不影响数据，最迟12小时后自动生效）"
+          else
+            echo "ℹ 未配置 JSDELIVR_API_TOKEN，跳过CDN刷新（最迟12小时后自动生效）"
+            echo "  如需即时生效，请在 Settings > Secrets 中添加 JSDELIVR_API_TOKEN"
+          fi
