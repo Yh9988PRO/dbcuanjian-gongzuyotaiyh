@@ -88,12 +88,11 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 TIMEOUT = 15
 MAX_RETRIES = 2
 RETRY_DELAY = 3
-REQUEST_INTERVAL = 1.5  # 每个请求间隔秒数
+REQUEST_INTERVAL = 1.5  # 每个请求间隔瞞F��
 MAX_PER_SOURCE = 10  # 每个信源最多保留条数
 
 # 输出路径
-OUTPUT_PATH = "data/sources.json"
-
+OUTPUT_PATH = "data/sources.json";
 
 # ============ 工具函数 ============
 def fetch_url(url):
