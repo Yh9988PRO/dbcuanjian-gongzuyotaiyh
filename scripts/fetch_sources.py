@@ -29,24 +29,38 @@ from urllib.parse import urljoin
 # ============ 配置区 ============
 # 只需配置 name(显示名称) 和 url(列表页URL)
 # 脚本会自动解析页面中的新闻/公告链接
+# 标注 [稳] 的是已验证可稳定抓取的，[试] 的是新增待验证的
 SOURCES = [
-    # ===== 国家级 =====
+    # ===== 国家级部委 [稳] =====
     {"name": "国资委", "url": "http://www.sasac.gov.cn/n2588035/n2588320/index.html"},
     {"name": "人社部", "url": "http://www.mohrss.gov.cn/SYrlzyhshbzb/zwgk/szrs/"},
     {"name": "教育部", "url": "http://www.moe.gov.cn/jyb_xwfb/gzdt_gzdt/"},
     {"name": "财政部", "url": "http://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/"},
-    # ===== 国家级招聘平台 =====
+    # ===== 国家级部委 [试] =====
+    {"name": "工信部", "url": "https://www.miit.gov.cn/jgsj/ggxs/wjfb/index.html"},
+    {"name": "国家发改委", "url": "https://www.ndrc.gov.cn/xwdt/xwfb/"},
+    {"name": "科技部", "url": "https://www.most.gov.cn/tztg/"},
+    {"name": "国家卫健委", "url": "http://www.nhc.gov.cn/wjw/zcjd/list.shtml"},
+    # ===== 国家级招聘平台 [试] =====
     {"name": "国聘行动", "url": "https://www.iguopin.com/"},
     {"name": "国家大学生就业服务平台", "url": "https://www.ncss.cn/"},
-    # ===== 地方级（深圳/广东）=====
+    {"name": "中国公共招聘网", "url": "http://job.mohrss.gov.cn/"},
+    # ===== 地方级（深圳/广东）[试] =====
     {"name": "深圳市人社局", "url": "http://hrss.sz.gov.cn/xxgk/zwdt/"},
     {"name": "深圳市考试院", "url": "http://hrss.sz.gov.cn/szksy/zwgk/kszl/"},
     {"name": "广东省人社厅", "url": "http://hrss.gd.gov.cn/zwgk/zwdt/"},
-    # ===== 央国企招聘 =====
-    {"name": "国资小新", "url": "https://weibo.com/sasacxw"},  # 微博可能抓不到，失败自动跳过
-    # ===== 教育培训机构（作为补充信号）=====
+    {"name": "广州市人社局", "url": "http://rsj.gz.gov.cn/ywzt/rszdgg/"},
+    # ===== 央国企官网招聘 [试] =====
+    {"name": "国家电网", "url": "http://www.sgcc.com.cn/html/sgcc_main/col2016080840/column_2016080840_1.shtml"},
+    {"name": "中国石油", "url": "https://www.cnpc.com.cn/cnpc/rczp/zpxx.shtml"},
+    {"name": "中国石化", "url": "http://www.sinopec.com.cn/company/recruit/"},
+    {"name": "中国建筑", "url": "https://www.cscec.com.cn/xxgg_148/zkxx/"},
+    {"name": "中国电信", "url": "https://www.chinatelecom.com.cn/zp/zpgg/"},
+    {"name": "中国移动", "url": "https://www.10086.cn/aboutus/recruitment/"},
+    # ===== 教育培训机构（补充信号）[试] =====
     {"name": "中公教育", "url": "https://www.offcn.com/gqzp/"},
     {"name": "华图教育", "url": "https://www.huatu.com/gq/"},
+    {"name": "粉笔网", "url": "https://www.fenbi.com/"},
 ]
 
 # 关键词白名单：标题包含这些词才会被保留
@@ -57,6 +71,10 @@ KEYWORDS = [
     "央企", "国企", "事业单位", "公务员", "编制", "铁饭碗",
     "白皮书", "政策", "方案", "目录", "计划", "专项",
     "2025", "2026", "2027", "2028",
+    # 扩充更多就业相关词
+    "网申", "宣讲", "双选会", "招聘会", "人才引进", "选聘",
+    "遴选", "选调", "三支一扶", "西部计划", "特岗", "代课",
+    "教师招聘", "医疗招聘", "银行招聘", "电网招聘", "烟草招聘",
 ]
 
 # 关键词黑名单：标题包含这些词会被过滤
